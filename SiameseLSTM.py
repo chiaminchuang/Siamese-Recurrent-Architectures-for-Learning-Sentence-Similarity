@@ -31,11 +31,11 @@ class SiameseLSTM():
             
         with tf.name_scope('Similarity'):
             self.diff = tf.reduce_sum(tf.abs(tf.subtract(self.masked_outputs_A, self.masked_outputs_B)), axis=1) # 32
-            self.similarity = tf.clip_by_value(tf.exp(-1.0 * self.diff), 1e-7, 1.0 - 1e-7)
+            self.similarity = tf.exp(-1.0 * self.diff)
         
         # MSE
         with tf.name_scope('Loss'):
-            diff = tf.subtract(self.similarity, tf.clip_by_value((self.relatedness - 1.0) / 4.0, 1e-7, 1.0 - 1e-7)) # 32
+            diff = tf.subtract(self.similarity, self.relatedness - 1.0) / 4.0) # 32
             self.loss = tf.square(diff) # (batch_size,)
             self.cost = tf.reduce_mean(self.loss) # (1,)
         
